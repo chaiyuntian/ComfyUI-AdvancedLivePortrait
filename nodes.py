@@ -827,8 +827,14 @@ class AdvancedLivePortrait:
 
             crop_with_fullsize = cv2.warpAffine(crop_out, psi.crop_trans_m, get_rgb_size(psi.src_rgb),
                                                 cv2.INTER_LINEAR)
-            out = np.clip(psi.mask_ori * crop_with_fullsize + (1 - psi.mask_ori) * psi.src_rgb, 0, 255).astype(
-                np.uint8)
+            h, w = crop_out.shape[:2]  # Size of the cropped image
+            crop_center = np.array([w // 2, h // 2, 1])  # Center in homogeneous coordinates
+            transformed_center = np.dot(psi.crop_trans_m, crop_center)  # Apply the affine transformation
+
+            center = (int(transformed_center[0]), int(transformed_center[1]))  # Final center for blending
+
+            
+            out = cv2.seamlessClone(crop_with_fullsize, psi.src_rgb, (psi.mask_ori * 255).astype(np.uint8), center, cv2.NORMAL_CLONE)
             out_list.append(out)
 
             self.pbar.update_absolute(i+1, total_length, ("PNG", Image.fromarray(crop_out), None))
