@@ -375,6 +375,13 @@ class LP_Engine:
                 mask_ori = cv2.warpAffine(self.GetMaskImg(), crop_trans_m, get_rgb_size(img_rgb), cv2.INTER_LINEAR)
                 mask_ori = mask_ori.astype(np.float32) / 255.
 
+                # Save the mask image
+                mask_save_path = "mask_output"
+                os.makedirs(mask_save_path, exist_ok=True)  # Create directory if it doesn't exist
+                mask_filename = os.path.join(mask_save_path, f"mask_image_{len(psi_list)}.png")
+                cv2.imwrite(mask_filename, (mask_ori * 255).astype(np.uint8))  # Save mask as PNG
+                print(f"Mask saved to {mask_filename}")
+
                 if is_changed:
                     s = (crop_region[2] - crop_region[0]) / 512.
                     crop_trans_m = create_transform_matrix(crop_region[0], crop_region[1], s, s)
@@ -733,7 +740,7 @@ class AdvancedLivePortrait:
                 self.psi_list = [motion_link[0]]
             else: return (None,None)
 
-        # tart preparing source images
+        # start preparing source images
         if src_images != None:
             src_length = len(src_images)
             if id(src_images) != id(self.src_images) or self.crop_factor != crop_factor:
