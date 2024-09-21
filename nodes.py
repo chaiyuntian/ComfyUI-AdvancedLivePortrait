@@ -733,6 +733,7 @@ class AdvancedLivePortrait:
                 self.psi_list = [motion_link[0]]
             else: return (None,None)
 
+        # tart preparing source images
         if src_images != None:
             src_length = len(src_images)
             if id(src_images) != id(self.src_images) or self.crop_factor != crop_factor:
